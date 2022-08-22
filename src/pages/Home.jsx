@@ -17,10 +17,11 @@ const Home = () => {
         setIsLoading(false);
       })
       .catch((err) => console.warn(err));
+    window.scrollTo(0, 0);
   }, []);
 
   return (
-    <>
+    <div className={'container'}>
       <div className="content__top">
         <Categories />
         <Sort />
@@ -31,7 +32,7 @@ const Home = () => {
           ? [...new Array(6)].map((_, i) => <Skeleton key={i} />)
           : items.map((pizza) => <PizzaBlock key={pizza.id} {...pizza} />)}
       </div>
-    </>
+    </div>
   );
 };
 
