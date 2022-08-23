@@ -1,10 +1,12 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setCategoryId, setCurrentPage } from '../redux/slices/filterSlice';
+import { setCategoryId, setCurrentPage, setFilters } from '../redux/slices/filterSlice';
 import axios from 'axios';
+import qs from 'qs';
+import { useNavigate } from 'react-router-dom';
 
 import Categories from '../components/Categories';
-import Sort from '../components/Sort';
+import Sort, { list } from '../components/Sort';
 import Skeleton from '../components/PizzaBlock/Skeleton';
 import PizzaBlock from '../components/PizzaBlock';
 import Pagination from '../components/Pagination';
@@ -13,6 +15,9 @@ import { SearchContext } from '../App';
 const Home = () => {
   const { categoryId, sort, currentPage } = useSelector((state) => state.filter);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const isSearch = useRef(false);
+  const isMounted = useRef(false);
 
   const { searchValue } = useContext(SearchContext);
   const [items, setItems] = useState([]);
@@ -26,7 +31,7 @@ const Home = () => {
     dispatch(setCurrentPage(number));
   };
 
-  useEffect(() => {
+  const fetchPizzas = () => {
     setIsLoading(true);
 
     const order = sort.sortProperty.includes('-') ? 'asc' : 'desc';
@@ -44,8 +49,40 @@ const Home = () => {
         setIsLoading(false);
       })
       .catch((err) => console.warn(err));
+  };
+
+  useEffect(() => {
+    if (window.location.search) {
+      const params = qs.parse(window.location.search.substring(1));
+      const sort = list.find((obj) => obj.sortProperty === params.sortProperty);
+      dispatch(
+        setFilters({
+          ...params,
+          sort,
+        }),
+      );
+      isSearch.current = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPizzas();
+    //! тут косяк с парсингом url в первый рендер
+    // isSearch.current = false;
     window.scrollTo(0, 0);
   }, [categoryId, sort.sortProperty, searchValue, currentPage]);
+
+  useEffect(() => {
+    if (isMounted.current) {
+      const queryString = qs.stringify({
+        sortProperty: sort.sortProperty,
+        categoryId,
+        currentPage,
+      });
+      navigate(`?${queryString}`);
+    }
+    isMounted.current = true;
+  }, [categoryId, sort.sortProperty, currentPage]);
 
   const pizzas = items
     // .filter((obj) => obj.title.toLowerCase().includes(searchValue.toLowerCase()))
