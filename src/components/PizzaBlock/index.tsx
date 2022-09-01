@@ -6,7 +6,16 @@ import { Link } from 'react-router-dom';
 
 const typesNames = ['тонкое', 'традиционное'];
 
-const PizzaBlock = ({ id, title, price, imageUrl, types, sizes }) => {
+type PizzaBlockProps = {
+  id: string;
+  title: string;
+  price: number;
+  imageUrl: string;
+  types: number[];
+  sizes: number[];
+};
+
+const PizzaBlock: React.FC<PizzaBlockProps> = ({ id, title, price, imageUrl, types, sizes }) => {
   const dispatch = useDispatch();
   const cartItem = useSelector(selectCartItemById(id));
   const [sizeIndex, setSizeIndex] = useState(0);
@@ -26,11 +35,11 @@ const PizzaBlock = ({ id, title, price, imageUrl, types, sizes }) => {
     dispatch(addItem(item));
   };
 
-  const onActiveSize = (i) => {
+  const onActiveSize = (i: number) => {
     setSizeIndex(i);
   };
 
-  const onActiveType = (i) => {
+  const onActiveType = (i: number) => {
     setTypeIndex(i);
   };
 
