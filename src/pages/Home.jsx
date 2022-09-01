@@ -83,9 +83,7 @@ const Home = () => {
     isMounted.current = true;
   }, [categoryId, sort.sortProperty, currentPage]);
 
-  const pizzas = items
-    // .filter((obj) => obj.title.toLowerCase().includes(searchValue.toLowerCase()))
-    .map((pizza) => <PizzaBlock key={pizza.id} {...pizza} />);
+  const pizzas = items.map((pizza) => <PizzaBlock key={pizza.id} {...pizza} />);
   const skeletons = [...new Array(6)].map((_, i) => <Skeleton key={i} />);
 
   return (
